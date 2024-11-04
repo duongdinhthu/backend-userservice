@@ -5,11 +5,19 @@ public class DoctorRegistrationDto {
     private String doctorEmail;
     private String doctorPhone;
     private String doctorPassword;
-    private Long roleId; // thêm roleId
+    private Integer roleId; // thêm roleId
 
     // Getters and Setters
     public String getDoctorName() {
         return doctorName;
+    }
+
+    public Integer getRoleId() {
+        return roleId;
+    }
+
+    public void setRoleId(Integer roleId) {
+        this.roleId = roleId;
     }
 
     public void setDoctorName(String doctorName) {

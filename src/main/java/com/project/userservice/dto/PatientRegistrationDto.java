@@ -5,13 +5,13 @@ public class PatientRegistrationDto {
     private String patientEmail;
     private String patientPhone;
     private String patientPassword;
-    private Long roleId; // thêm roleId
+    private Integer roleId; // thêm roleId
 
-    public Long getRoleId() {
+    public Integer getRoleId() {
         return roleId;
     }
 
-    public void setRoleId(Long roleId) {
+    public void setRoleId(Integer roleId) {
         this.roleId = roleId;
     }
 
