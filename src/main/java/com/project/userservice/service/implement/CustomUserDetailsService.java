@@ -58,8 +58,6 @@ public class CustomUserDetailsService implements UserDetailsService {
             System.out.println("Staff found: " + staff.getStaffEmail() + ", Role: " + roleName);
             return createUserDetails(staff.getStaffEmail(), staff.getStaffPassword(), roleName);
         }
-
-
         throw new UsernameNotFoundException("User not found with email: " + email);
     }
 
