@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Enumeration;
 import java.util.List;
 
 
@@ -29,50 +30,49 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
-        final String authorizationHeader = request.getHeader("Authorization");
+
+        // Lấy URL của request
+        String requestURI = request.getRequestURI();
+
+        // Bỏ qua kiểm tra JWT cho các API không cần xác thực
+        if (requestURI.startsWith("/api/userservice/login") ||
+                requestURI.startsWith("/api/userservice/patients/register") ||
+                requestURI.startsWith("/api/userservice/doctors/register") ||
+                requestURI.startsWith("/api/userservice/staffs/register")) {
+            // Nếu là các API này, không cần kiểm tra JWT, chỉ cần tiếp tục với chuỗi bộ lọc
+            chain.doFilter(request, response);
+            System.out.println("api khong yeu cau jwt");
+            return;
+        }
+
+        final String authorizationHeader = request.getHeader("authorization");
 
         String username = null;
         String jwt = null;
 
-        // In ra header Authorization
-        System.out.println("Authorization Header: " + authorizationHeader);
-
+        // Kiểm tra nếu header chứa Bearer Token
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            jwt = authorizationHeader.substring(7);
-            username = jwtUtils.getUsername(jwt);
-
-            // In ra giá trị jwt và username
-            System.out.println("JWT: " + jwt);
-            System.out.println("Username from JWT: " + username);
-        } else {
-            System.out.println("Authorization header is missing or does not start with 'Bearer '");
+            jwt = authorizationHeader.substring(7);  // Lấy JWT từ header
+            username = jwtUtils.getUsername(jwt);  // Lấy username từ JWT
         }
 
         // Nếu username không null và không có authentication trong context
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-            // In ra thông tin userDetails
-            System.out.println("UserDetails: " + userDetails);
-
             // Kiểm tra token hợp lệ
             if (jwtUtils.validateToken(jwt)) {
                 List<GrantedAuthority> authorities = jwtUtils.getAuthorities(jwt); // Lấy authorities từ JWT
 
-                // In ra authorities
-                System.out.println("Authorities: " + authorities);
-
+                // Tạo đối tượng Authentication và thiết lập nó vào SecurityContext
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails, null, authorities);
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
-            } else {
-                System.out.println("JWT is not valid");
             }
         }
 
+        // Tiếp tục xử lý yêu cầu
         chain.doFilter(request, response);
     }
-
-
 }

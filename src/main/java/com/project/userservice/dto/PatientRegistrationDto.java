@@ -1,12 +1,22 @@
 package com.project.userservice.dto;
 
+import java.util.Date;
+
 public class PatientRegistrationDto {
     private String patientName;
     private String patientEmail;
     private String patientPhone;
     private String patientPassword;
     private Integer roleId; // thêm roleId
-
+    private Date dateOfBirth;
+    public PatientRegistrationDto() {
+    }
+    public Date getDateOfBirth() {
+        return dateOfBirth;
+    }
+    public void setDateOfBirth(Date dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
     public Integer getRoleId() {
         return roleId;
     }
@@ -46,5 +56,16 @@ public class PatientRegistrationDto {
 
     public void setPatientPassword(String patientPassword) {
         this.patientPassword = patientPassword;
+    }
+
+    @Override
+    public String toString() {
+        return "PatientRegistrationDto{" +
+                "patientName='" + patientName + '\'' +
+                ", patientEmail='" + patientEmail + '\'' +
+                ", patientPhone='" + patientPhone + '\'' +
+                ", patientPassword='" + patientPassword + '\'' +
+                ", roleId=" + roleId +
+                '}';
     }
 }

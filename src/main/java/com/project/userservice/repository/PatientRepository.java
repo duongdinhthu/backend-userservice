@@ -2,7 +2,11 @@ package com.project.userservice.repository;
 
 import com.project.userservice.model.Patients;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface PatientsRepository extends JpaRepository<Patients, Long> {
+import java.util.Optional;
+
+@Repository
+public interface PatientRepository extends JpaRepository<Patients, Integer> {
     Patients findByPatientEmail(String email);
 }

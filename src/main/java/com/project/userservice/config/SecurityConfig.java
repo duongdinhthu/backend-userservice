@@ -1,7 +1,7 @@
 package com.project.userservice.config;
 
-import com.project.userservice.security.JwtRequestFilter; // Import bộ lọc JWT
-import com.project.userservice.service.CustomUserDetailsService;
+import com.project.userservice.security.JwtRequestFilter;
+import com.project.userservice.service.implement.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -10,7 +10,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -36,16 +35,28 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers("/api/auth/login", "/api/auth/register/**").permitAll()
-                                .requestMatchers("/api/auth/patient/**").hasRole("PATIENT")
-                                .requestMatchers("/api/auth/doctor/**").hasRole("DOCTOR")
-                                .requestMatchers("/api/auth/staff/**").hasAnyRole("STAFF")
-                                .requestMatchers("/api/auth/admin/**").hasAnyRole("ADMIN")
-
+                                .requestMatchers("/api/userservice/login"
+                                        , "/api/userservice/patients/**"
+                                        , "/api/userservice/doctors/**"
+                                        , "/api/userservice/staffs/**").permitAll()
+                                .requestMatchers("/api/userservice/patient/").hasRole("PATIENT")
+                                .requestMatchers("/api/userservice/doctor/").hasRole("DOCTOR")
+                                .requestMatchers("/api/userservice/staff/").hasRole("STAFF")
+                                .requestMatchers("/api/userservice/admin/").hasRole("ADMIN")
                                 .anyRequest().authenticated()
                 )
                 .csrf(csrf -> csrf.disable()) // Tắt CSRF nếu không cần
-                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class); // Thêm bộ lọc JWT vào chuỗi bộ lọc
+                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class) // Thêm bộ lọc JWT vào chuỗi bộ lọc
+                .cors(cors -> cors.configurationSource(request -> {
+                    var corsConfig = new org.springframework.web.cors.CorsConfiguration();
+                    corsConfig.setAllowedOrigins(java.util.Collections.singletonList("http://localhost:8080")); // Cho phép tất cả các nguồn
+                    corsConfig.setAllowedMethods(java.util.Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")); // Cho phép tất cả các phương thức
+                    corsConfig.setAllowedHeaders(java.util.Arrays.asList("*")); // Cho phép tất cả các header
+                    corsConfig.setAllowCredentials(true); // Cho phép gửi cookie
+                    return corsConfig;
+                })) // Cấu hình CORS chấp nhận tất cả
+                .authenticationManager(authManager(http)); // Thêm AuthenticationManager vào cấu hình
+
         return http.build();
     }
 

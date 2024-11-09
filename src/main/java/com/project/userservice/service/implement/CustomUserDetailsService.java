@@ -1,7 +1,7 @@
-package com.project.userservice.service;
+package com.project.userservice.service.implement;
 
 import com.project.userservice.model.*;
-import com.project.userservice.repository.PatientsRepository;
+import com.project.userservice.repository.PatientRepository;
 import com.project.userservice.repository.DoctorsRepository;
 import com.project.userservice.repository.StaffsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +16,11 @@ import java.util.List;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
+    @Autowired
+    SendEmail sendEmail;
 
     @Autowired
-    private PatientsRepository patientsRepository;
+    private PatientRepository patientRepository;
 
     @Autowired
     private DoctorsRepository doctorsRepository;
@@ -29,7 +31,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         // Tìm kiếm trong bảng Patients
-        Patients patient = patientsRepository.findByPatientEmail(email);
+        Patients patient = patientRepository.findByPatientEmail(email);
         if (patient != null) {
             Role role = patient.getRole(); // Lấy đối tượng Role của staff
             String roleName = role.getName().toUpperCase();
